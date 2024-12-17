@@ -1,9 +1,9 @@
-import cv2
+import argparse
 import os
-import roboflow
 import random
-
+import cv2
 from tqdm import tqdm
+from roboflow import Roboflow
 
 def extract_frames_and_upload_to_roboflow(
     video_path: str,
@@ -14,29 +14,19 @@ def extract_frames_and_upload_to_roboflow(
     test_split_ratio: float = 0.2
 ) -> None:
     """
-    Extracts frames from a video and uploads them to a Roboflow project with train/test splitting.
+    Extract frames from a video and upload them to a Roboflow project with train/test splitting.
 
-    Parameters
-    ----------
-    video_path : str
-        Path to the input video file.
-    output_dir : str
-        Directory to temporarily save extracted frames.
-    workspace_name : str
-        Name of the Roboflow workspace.
-    project_name : str
-        Name of the Roboflow project.
-    frame_interval : int, optional
-        Interval at which frames are extracted (default is 1, meaning every frame).
-    test_split_ratio : float, optional
-        Proportion of frames to be assigned to the "test" split (default is 0.2).
+    Args:
+        video_path (str): Path to the input video file.
+        output_dir (str): Directory to temporarily save extracted frames.
+        workspace_name (str): Name of the Roboflow workspace.
+        project_name (str): Name of the Roboflow project.
+        frame_interval (int, optional): Interval at which frames are extracted. Defaults to 1 (every frame).
+        test_split_ratio (float, optional): Proportion of frames assigned to the "test" split. Defaults to 0.2.
 
-    Raises
-    ------
-    FileNotFoundError
-        If the video file does not exist.
-    ValueError
-        If the video cannot be opened.
+    Raises:
+        FileNotFoundError: If the video file does not exist.
+        ValueError: If the video cannot be opened or contains no frames.
     """
     # Validate input arguments
     if not os.path.exists(video_path):
@@ -45,7 +35,7 @@ def extract_frames_and_upload_to_roboflow(
         raise ValueError("test_split_ratio must be between 0 and 1.")
 
     # Authenticate with Roboflow
-    rf = roboflow.Roboflow(api_key="e6Dh3ZD6uI6eGuCaAajs")
+    rf = Roboflow(api_key="e6Dh3ZD6uI6eGuCaAajs")
     workspace = rf.workspace(workspace_name)
     project = workspace.project(project_name)
 
@@ -100,21 +90,28 @@ def extract_frames_and_upload_to_roboflow(
     # Final log message
     print(f"Processing complete: {saved_count} frames uploaded to Roboflow.")
 
+def main() -> None:
+    """
+    Parse CLI arguments and initiate frame extraction and upload.
+    """
+    parser = argparse.ArgumentParser(description="Extract frames from a video and upload them to Roboflow.")
+    parser.add_argument("--video_path", type=str, required=True, help="Path to the input video file.")
+    parser.add_argument("--output_dir", type=str, required=True, help="Directory to save extracted frames.")
+    parser.add_argument("--workspace_name", type=str, required=True, help="Roboflow workspace name.")
+    parser.add_argument("--project_name", type=str, required=True, help="Roboflow project name.")
+    parser.add_argument("--frame_interval", type=int, default=1, help="Interval for frame extraction (default: 1).")
+    parser.add_argument("--test_split_ratio", type=float, default=0.2, help="Proportion of test split (default: 0.2).")
 
-# Example usage
-if __name__ == "__main__":
-    video_path = "/Users/baptiste/Downloads/Head-Dectection-PoC/IMG_2685.MOV"
-    output_dir = "/Users/baptiste/Downloads/Head-Dectection-PoC/TempFrames"
-    workspace_name = "insight-wpiwn"
-    project_name = "head-detection-v1-92vg2"
-    frame_interval = 1
-    test_split_ratio = 0.2
+    args = parser.parse_args()
 
     extract_frames_and_upload_to_roboflow(
-        video_path=video_path,
-        output_dir=output_dir,
-        workspace_name=workspace_name,
-        project_name=project_name,
-        frame_interval=frame_interval,
-        test_split_ratio=test_split_ratio
+        video_path=args.video_path,
+        output_dir=args.output_dir,
+        workspace_name=args.workspace_name,
+        project_name=args.project_name,
+        frame_interval=args.frame_interval,
+        test_split_ratio=args.test_split_ratio
     )
+
+if __name__ == "__main__":
+    main()
