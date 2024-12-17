@@ -16,7 +16,7 @@ def download_dataset(version_number: int) -> NoReturn:
         # Access the requested version
         version = project.version(version_number)
         print(f"Downloading dataset for version {version_number}...")
-        version.download("coco")  # Change the format if necessary
+        version.download("yolov8")  # Change the format if necessary
         print("Download complete!")
     except Exception as e:
         print(f"Error: {e}. Failed to download version {version_number}.")
