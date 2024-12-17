@@ -10,8 +10,8 @@ from bbox_dataset import BBoxDataset
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-if torch.backends.mps.is_available():
-    torch.mps.empty_cache()
+if torch.cuda.is_available():
+    torch.cuda.empty_cache()
 
 class BBoxDetectionModel(nn.Module):
     def __init__(self, num_bboxes=100):
@@ -80,8 +80,8 @@ def train_model(model, train_loader, criterion, optimizer, device, num_epochs=10
 
 
 if __name__ == "__main__":
-    if torch.backends.mps.is_available():
-        device = torch.device("mps")
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
     else:
         device = torch.device("cpu")
     logging.info(f"Using device: {device}")
