@@ -168,6 +168,7 @@ cython_debug/
 #.idea/
 
 *.txt
+$.pth
 *.jpeg
 *.jpg 
-*.json
+*.yaml
